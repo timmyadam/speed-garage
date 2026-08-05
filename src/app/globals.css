@@ -1,26 +1,425 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   SPEED GARAGE — Design tokens
+   Temă: pit-lane noaptea. Asfalt cald + lampă cu sodiu.
+   Dark-only (jocul e nocturn prin definiție), fără light mode.
+   Vezi DESIGN.md pentru motivația fiecărei valori.
+   ========================================================================== */
+
+@theme {
+  /* --- Tipografie ------------------------------------------------------- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-saira), var(--font-inter), ui-sans-serif, sans-serif;
+
+  /* --- Neutre: rampă „asfalt", caldă, nu gri-albastru ------------------- */
+  --color-bg: #0a0b0c; /* fundal pagină */
+  --color-surface: #121316; /* card */
+  --color-surface-2: #191b1f; /* card ridicat / rând hover */
+  --color-surface-3: #212429; /* modal / popover */
+  --color-track: #26292f; /* șina barelor de progres (inert) */
+  --color-line: #23262b; /* bordură subtilă */
+  --color-line-strong: #333840; /* bordură vizibilă / separator activ */
+
+  --color-fg: #e9edf2; /* text principal   — 15.4:1 pe bg */
+  --color-fg-2: #a3acba; /* text secundar    —  8.9:1 pe bg */
+  --color-fg-3: #7c8593; /* text muted       —  5.5:1 pe bg */
+  --color-fg-disabled: #565d68; /*                  3.1:1 (doar inert) */
+
+  /* --- Accent: „Sodium" — portocaliu de lampă de garaj ------------------ */
+  --color-accent: #ff7a18; /* 7.5:1 pe bg */
+  --color-accent-strong: #ff9445; /* hover: pe dark se luminează, nu se întunecă */
+  --color-accent-press: #db6109;
+  --color-accent-fg: #140a02; /* text pe accent — 8.0:1 */
+  --color-accent-wash: #2a1608; /* suprafață tentată cu accent */
+  --color-accent-line: #58300f;
+
+  /* --- Semantice de rezultat ------------------------------------------- */
+  --color-win: #2fd07b; /* steag verde   — 10.2:1 */
+  --color-win-wash: #0d2419;
+  --color-lose: #ff3b30; /* steag roșu    —  5.8:1 */
+  --color-lose-wash: #2b0f0d;
+  --color-caution: #ffc53d; /* steag galben  — 13.0:1 */
+  --color-caution-wash: #2b220c;
+  --color-info: #3b9eff; /* neutru informativ — 7.3:1 */
+  --color-info-wash: #0c1d2e;
+
+  /* --- Rarități: rampa de anodizare a titanului ------------------------- */
+  --color-common: #93a1af; /* oțel brut        — 7.8:1 */
+  --color-common-wash: #1a1d21;
+  --color-rare: #3b9eff; /* titan albastru   — 7.3:1 */
+  --color-rare-wash: #0c1d2e;
+  --color-epic: #b072ff; /* titan violet     — 6.5:1 */
+  --color-epic-wash: #1d1330;
+  --color-legendary: #ffc53d; /* aur topit        — 13.0:1 */
+  --color-legendary-wash: #2b220c;
+
+  /* --- Rază: piese prelucrate, nu bule --------------------------------- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --ease-out-quick: cubic-bezier(0.2, 0.8, 0.3, 1);
+
+  --animate-sg-shimmer: sg-shimmer 1.6s linear infinite;
+  --animate-sg-spin: sg-spin 0.7s linear infinite;
+  --animate-sg-toast-in: sg-toast-in 220ms var(--ease-out-quick) both;
+  --animate-sg-overlay-in: sg-overlay-in 160ms var(--ease-out-quick) both;
+  --animate-sg-panel-in: sg-panel-in 200ms var(--ease-out-quick) both;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ==========================================================================
+   Bază
+   ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    /* Textură de asfalt: două hairline-uri de „ecran de cronometraj".
+       Static — nu se mișcă niciodată, nu concurează cu conținutul. */
+    background-image:
+      linear-gradient(to bottom, #101114 0%, var(--color-bg) 380px),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 0.014) 0 1px,
+        transparent 1px 4px
+      );
+    background-repeat: no-repeat, repeat;
+  }
+
+  /* Titlurile folosesc fața condensată; tracking negativ + line-height strâns. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  /* Un singur inel de focus, peste tot, imposibil de ratat. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Nimic nu depășește containerul din cauza unui nume lung sau URL. */
+  p,
+  span,
+  h1,
+  h2,
+  h3,
+  h4 {
+    overflow-wrap: break-word;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-fg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Utilitare proprii
+   ========================================================================== */
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Colț teșit — semnătura vizuală a produsului (panou de caroserie). */
+@utility sg-chamfer {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 18px) 0,
+    100% 18px,
+    100% 100%,
+    0 100%
+  );
+}
+
+@utility sg-chamfer-sm {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Hașură diagonală pentru zone inerte / goale (bandă de pit). */
+@utility sg-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(255 255 255 / 0.035) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* Grilă de cronometraj pentru fundaluri de secțiune goale. */
+@utility sg-grid {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ==========================================================================
+   Silueta de mașină — 100% CSS, derivată din culoarea mașinii.
+   Fără imagini, fără SVG extern, fără emoji.
+   Consumă --car-accent setat inline de componentă.
+   ========================================================================== */
+
+.sg-car {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+}
+
+/* Halou jos: sugerează asfalt umed sub mașină. */
+.sg-car__glow {
+  position: absolute;
+  inset: auto 4% 2% 4%;
+  height: 38%;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    color-mix(in oklab, var(--car-accent) 55%, transparent) 0%,
+    transparent 70%
+  );
+  filter: blur(12px);
+  opacity: 0.34;
+  z-index: 0;
+}
+
+.sg-car__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  z-index: 1;
+}
+
+/* Caroseria: profil lateral de coupé, tăiat din poligon.
+   Botul lung, habitaclu împins spre spate, pavilion jos — proporție de
+   sport-coupé, nu de mașină de desen animat. */
+.sg-car__body {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(
+    0% 66%,
+    1.5% 55%,
+    10% 48.5%,
+    28% 45%,
+    40% 41.5%,
+    52.5% 22%,
+    67% 21%,
+    83% 41.5%,
+    96% 43.5%,
+    100% 52%,
+    100% 74%,
+    0% 74%
+  );
+  background:
+    linear-gradient(
+      163deg,
+      color-mix(in oklab, var(--car-accent) 88%, white 12%) 0%,
+      var(--car-accent) 34%,
+      color-mix(in oklab, var(--car-accent) 52%, #06070a) 72%,
+      color-mix(in oklab, var(--car-accent) 20%, #06070a) 100%
+    );
+}
+
+/* Dungă de livery, înclinată — trece peste caroserie, tăiată de aceeași formă. */
+.sg-car__stripe {
+  position: absolute;
+  inset: 0;
+  clip-path: inherit;
+  background: linear-gradient(
+    104deg,
+    transparent 0 46%,
+    rgb(255 255 255 / 0.16) 46% 51%,
+    transparent 51% 55%,
+    rgb(0 0 0 / 0.22) 55% 62%,
+    transparent 62%
+  );
+}
+
+/* Muchia de umăr: hairline de lumină pe linia de caroserie. */
+.sg-car__shoulder {
+  position: absolute;
+  inset: 0;
+  clip-path: inherit;
+  background: linear-gradient(
+    to bottom,
+    transparent 0 45%,
+    rgb(255 255 255 / 0.3) 45% 45.8%,
+    transparent 45.8% 64%,
+    rgb(0 0 0 / 0.28) 64% 74%,
+    rgb(0 0 0 / 0.55) 74% 100%
+  );
+}
+
+/* Habitaclu — geamuri reci, cu montant central, ca sticla sub neon de garaj. */
+.sg-car__glass {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(43.5% 40%, 53.5% 24%, 65.5% 23.2%, 77.5% 40%);
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 57.5%,
+      rgb(10 11 13 / 0.9) 57.5% 59%,
+      transparent 59%
+    ),
+    linear-gradient(150deg, #333a43 0%, #161a1f 52%, #0a0c0f 100%);
+}
+
+/* Aripa: arcul întunecat în care intră roata.
+   E copil al caroseriei, deci îl taie același clip-path — arcul e *scobit*
+   în tablă, nu un disc negru lipit peste ea. */
+.sg-car__arch {
+  position: absolute;
+  bottom: 11%;
+  width: 19.5%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 35%,
+    #07080a 62%,
+    color-mix(in oklab, var(--car-accent) 22%, #07080a) 100%
+  );
+}
+
+.sg-car__arch--front {
+  left: 9.5%;
+}
+
+.sg-car__arch--rear {
+  right: 9.5%;
+}
+
+.sg-car__wheel {
+  position: absolute;
+  bottom: 9%;
+  width: 15%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #101215;
+  box-shadow:
+    inset 0 0 0 1px #383e46,
+    inset 0 0 0 3px #191c21;
+}
+
+/* Janta: singurul loc unde culoarea mașinii revine jos, ca ecou. */
+.sg-car__wheel::after {
+  content: "";
+  position: absolute;
+  inset: 26%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in oklab, var(--car-accent) 85%, white 15%),
+    color-mix(in oklab, var(--car-accent) 45%, #0d0f12) 100%
+  );
+}
+
+.sg-car__wheel--front {
+  left: 11.5%;
+}
+
+.sg-car__wheel--rear {
+  right: 11.5%;
+}
+
+/* Umbra de contact cu solul. */
+.sg-car__contact {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 7%;
+  height: 3px;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.75);
+  filter: blur(3px);
+}
+
+/* ==========================================================================
+   Keyframes — patru, toate cu rol comunicativ.
+   ========================================================================== */
+
+@keyframes sg-shimmer {
+  from {
+    background-position: -160% 0;
+  }
+  to {
+    background-position: 260% 0;
+  }
+}
+
+@keyframes sg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sg-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sg-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sg-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion — se taie tot, inclusiv shimmer-ul de skeleton.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# specificatia originala a proiectului, nu se publica
+/car-game-prompt.md

@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Speed Garage
 
-## Getting Started
+Joc web complex cu mașini — 100% frontend, fără backend și fără bază de date. Toate datele sunt mock (TypeScript), iar progresul jucătorului se salvează în `localStorage`.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript** strict mode
+- **Tailwind CSS v4** (tokens definite prin `@theme` în `src/app/globals.css`, fără `tailwind.config`)
+- **Phosphor Icons** (`@phosphor-icons/react`)
+- **Zustand** pentru state global, cu persistență debounced în `localStorage`
+- Componente custom, construite de la zero (fără component libraries)
+
+## Moduri de joc
+
+| Mod | Descriere |
+| --- | --- |
+| **Garaj** | Colecție, magazin de mașini, upgrade-uri (motor, turbo, anvelope, greutate) |
+| **Cursă** | Drag race pe 400m cu mini-joc de timing pe schimbarea treptelor |
+| **Duel** | Top Trumps — 5 runde de comparat statistici împotriva unui adversar |
+| **Quiz** | Întrebări auto cu timer și multiplicator de streak |
+
+Toate cele patru moduri alimentează o economie comună: monede, XP, nivel de jucător și achievements.
+
+## Rulare locală
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplicația pornește pe `http://localhost:3000`. Nu sunt necesare variabile de mediu sau chei API.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build   # build de producție
+npm run lint    # ESLint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentație
 
-## Learn More
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — modele de date, state management, schema de persistență, formulele motorului de joc
+- [`DESIGN.md`](./DESIGN.md) — design system: paletă, tipografie, spacing, wireframe-uri per ecran
 
-To learn more about Next.js, take a look at the following resources:
+## Structura proiectului
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/          rute App Router (dashboard, garage, race, duel, quiz, leaderboard, profile)
+  components/   componente UI grupate pe domeniu (common, layout, cars, race, duel, quiz)
+  types/        modele TypeScript
+  data/         date mock (mașini, întrebări quiz, achievements, leaderboard)
+  services/     strat de "API" simulat (funcții async peste datele mock)
+  lib/          motorul jocului — funcții pure (cursă, duel, economie, achievements)
+  store/        store Zustand cu slice-uri și hidratare din localStorage
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Resetarea progresului
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Progresul se șterge din ecranul de **Profil** sau golind `localStorage` din DevTools.
