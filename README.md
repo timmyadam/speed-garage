@@ -1,5 +1,7 @@
 # Speed Garage
 
+**▶ Joacă: [speed-garage-ten.vercel.app](https://speed-garage-ten.vercel.app/)**
+
 Joc web complex cu mașini — 100% frontend, fără backend și fără bază de date. Toate datele sunt mock (TypeScript), iar progresul jucătorului se salvează în `localStorage`.
 
 ## Stack
