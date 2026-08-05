@@ -116,6 +116,12 @@ export interface DuelResult {
   roundsLost: number;
   roundsDrawn: number;
   won: boolean;
+  /**
+   * Ratingul general al celor două mașini. La egalitate de runde el decide
+   * învingătorul, deci UI-ul trebuie să-l poată arăta ca justificare.
+   */
+  playerRating: number;
+  opponentRating: number;
   coinsEarned: number;
   xpEarned: number;
 }

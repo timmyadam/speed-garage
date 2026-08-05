@@ -292,6 +292,8 @@ export async function runDuel(input: RunDuelInput): Promise<DuelResult> {
     roundsLost: simulation.roundsLost,
     roundsDrawn: simulation.roundsDrawn,
     won: simulation.won,
+    playerRating: simulation.playerRating,
+    opponentRating: simulation.opponentRating,
     coinsEarned: rewards.coins,
     xpEarned: rewards.xp,
   };

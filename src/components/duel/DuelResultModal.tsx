@@ -59,6 +59,33 @@ export function DuelResultModal({
         {result.roundsWon} din {result.rounds.length} categorii câștigate
       </p>
 
+      {/*
+        Egalitate la runde: meciul e decis de ratingul general al mașinii.
+        Fără explicația asta, un „2 – 2" marcat drept victorie pare o eroare.
+      */}
+      {result.roundsWon === result.roundsLost &&
+      Number.isFinite(result.playerRating) &&
+      Number.isFinite(result.opponentRating) ? (
+        <p className="mt-3 rounded-md border border-line bg-surface-2 px-3 py-2 text-sm text-fg-2">
+          Egalitate la runde — departajare după ratingul mașinii:{" "}
+          <span
+            className={`font-display font-bold tnum ${
+              result.won ? "text-win" : "text-fg"
+            }`}
+          >
+            {result.playerRating}
+          </span>{" "}
+          <span className="text-fg-3">vs</span>{" "}
+          <span
+            className={`font-display font-bold tnum ${
+              result.won ? "text-fg" : "text-lose"
+            }`}
+          >
+            {result.opponentRating}
+          </span>
+        </p>
+      ) : null}
+
       <dl className="mt-4">
         <div className="flex items-baseline justify-between gap-4 border-b border-line py-2">
           <dt className="text-sm text-fg-3">Monede</dt>
